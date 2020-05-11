@@ -1,4 +1,3 @@
-
 #
 #  Copyright 2016 cloudbau GmbH
 #
@@ -30,10 +29,9 @@ module OpenstackclientCookbook
     default_action :create
 
     action :create do
-      domain = new_resource.connection.domains.find { |u| u.name == new_resource.domain_name }
+      domain = new_resource.connection.domains.find { |d| d.name == new_resource.domain_name }
       project = new_resource.connection.projects.find do |p|
-        p.name = new_resource.project_name
-        domain ? p.domain_id = domain.id : {}
+        (p.name == new_resource.project_name) && (domain ? p.domain_id == domain.id : {})
       end
       user = new_resource.connection.users.find_by_name(
           new_resource.user_name,
@@ -60,7 +58,7 @@ module OpenstackclientCookbook
     end
 
     action :delete do
-      domain = new_resource.connection.domains.find { |u| u.name == new_resource.domain_name }
+      domain = new_resource.connection.domains.find { |d| d.name == new_resource.domain_name }
       user = new_resource.connection.users.find_by_name(
           new_resource.user_name,
           domain ? { domain_id: domain.id } : {}
@@ -74,10 +72,9 @@ module OpenstackclientCookbook
 
     # Grant a role in a project
     action :grant_role do
-      domain = new_resource.connection.domains.find { |u| u.name == new_resource.domain_name }
+      domain = new_resource.connection.domains.find { |d| d.name == new_resource.domain_name }
       project = new_resource.connection.projects.find do |p|
-        p.name = new_resource.project_name
-        domain ? p.domain_id = domain.id : {}
+        (p.name == new_resource.project_name) && (domain ? p.domain_id == domain.id : {})
       end
       role = new_resource.connection.roles.find { |r| r.name == new_resource.role_name }
       user = new_resource.connection.users.find_by_name(
@@ -88,14 +85,13 @@ module OpenstackclientCookbook
     end
 
     action :revoke_role do
-      domain = new_resource.connection.domains.find { |u| u.name == new_resource.domain_name }
+      domain = new_resource.connection.domains.find { |d| d.name == new_resource.domain_name }
       user = new_resource.connection.users.find_by_name(
           new_resource.user_name,
           domain ? { domain_id: domain.id } : {}
       ).first
       project = new_resource.connection.projects.find do |p|
-        p.name = new_resource.project_name
-        domain ? p.domain_id = domain.id : {}
+        (p.name == new_resource.project_name) && (domain ? p.domain_id == domain.id : {})
       end
       role = new_resource.connection.roles.find { |r| r.name == new_resource.role_name }
       project.revoke_role_from_user role.id, user.id if role && project && user
@@ -106,7 +102,7 @@ module OpenstackclientCookbook
     # only used to identify a user who is in that domain. This action grants
     # the user a role in the domain.
     action :grant_domain do
-      domain = new_resource.connection.domains.find { |u| u.name == new_resource.domain_name }
+      domain = new_resource.connection.domains.find { |d| d.name == new_resource.domain_name }
       user = new_resource.connection.users.find_by_name(
           new_resource.user_name,
           domain ? { domain_id: domain.id } : {}
@@ -116,7 +112,7 @@ module OpenstackclientCookbook
     end
 
     action :revoke_domain do
-      domain = new_resource.connection.domains.find { |u| u.name == new_resource.domain_name }
+      domain = new_resource.connection.domains.find { |d| d.name == new_resource.domain_name }
       user = new_resource.connection.users.find_by_name(
           new_resource.user_name,
           domain ? { domain_id: domain.id } : {}
